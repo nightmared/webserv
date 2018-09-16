@@ -1,6 +1,15 @@
+use std::io::{ErrorKind, Error};
+use std::convert::From;
+
 #[derive(Debug)]
 pub enum MatchingError {
     StringNotFound
+}
+
+impl From<MatchingError> for Error {
+    fn from(e: MatchingError) -> Error {
+        Error::from(ErrorKind::NotFound)
+    }
 }
 
 #[derive(Debug)]
