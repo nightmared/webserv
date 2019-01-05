@@ -1,4 +1,4 @@
-use crate::messagequeue::*;
+use crate::lib::messagequeue::*;
 use std::thread;
 use std::time::{Duration, SystemTime};
 use std::sync::mpsc::channel;

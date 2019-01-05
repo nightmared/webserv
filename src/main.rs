@@ -3,9 +3,7 @@ extern crate test;
 extern crate libc;
 #[cfg(test)]
 mod tests;
-mod http;
-mod backingstore;
-mod messagequeue;
+mod lib;
 
 fn main() {
 }

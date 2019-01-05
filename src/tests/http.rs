@@ -1,6 +1,6 @@
 use test::Bencher;
 use std::str;
-use crate::http;
+use crate::lib::http;
 use rand::{Rng, RngCore};
 
 static BASE_QUERY: &'static str = "\r\n\r\nGET /lol17 HTTP/1.1\r\ntype: lol\r\n\r\n";
@@ -55,8 +55,8 @@ fn bench_http_parsing_long_500_4096(b: &mut Bencher) {
 }
 
 #[bench]
-fn bench_http_parsing_long_25000_65536(b: &mut Bencher) {
-    let req = generate_long_http_query(25000, 65536);
+fn bench_http_parsing_long_5000_65536(b: &mut Bencher) {
+    let req = generate_long_http_query(5000, 65536);
 
     b.iter(|| {
         http::HttpQuery::from_string(&req).unwrap();

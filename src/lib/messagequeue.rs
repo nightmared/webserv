@@ -2,7 +2,7 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::{io, thread};
 use std::time::Duration;
-use crate::backingstore::BackingStore;
+use crate::lib::backingstore::BackingStore;
 
 /// The whole point of this struct is to be able to share it inside an Arc to prevent the sender
 /// from being deleted while having a Reader still exists, thus leading to memory unsafety (hereby
@@ -44,8 +44,8 @@ impl From<nix::Error> for MessageQueueError {
     }
 }
 
-impl From<crate::backingstore::AllocationFailed> for MessageQueueError {
-    fn from(_: crate::backingstore::AllocationFailed) -> Self {
+impl From<crate::lib::backingstore::AllocationFailed> for MessageQueueError {
+    fn from(_: crate::lib::backingstore::AllocationFailed) -> Self {
         MessageQueueError::MemoryAllocationFailed
     }
 }
