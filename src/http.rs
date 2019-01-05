@@ -1,5 +1,6 @@
 use std::collections::HashMap;
-//use std::io;
+use std::str;
+use std::mem;
 
 #[derive(Debug, Clone)]
 pub enum HTTPVerb {
@@ -33,9 +34,10 @@ impl HTTPVerb {
 #[derive(Debug, Clone)]
 pub struct HttpQuery<'a> {
     pub verb: HTTPVerb,
-    pub url: String,
+    pub url: &'a str,
+    // the body remain an array of u8 because it can be binary data
     pub body: &'a [u8],
-    pub headers: HashMap<String, String>
+    pub headers: HashMap<&'a str, &'a str>
 }
 
 struct Parser<'a> {
@@ -48,7 +50,6 @@ pub enum ParserError {
     /// EOF reached while parsing
     EOF,
     InvalidData,
-    //IOError(io::Error),
     UTFError(std::string::FromUtf8Error)
 }
 
@@ -106,7 +107,7 @@ impl<'a> HttpQuery<'a> {
         let verb = HTTPVerb::parse_from_utf8(parser.get_until(b" ")?).unwrap_or(HTTPVerb::GET);
 
         // retrieve the queried url
-        let url = String::from_utf8(parser.get_until(b" ")?.to_vec())?;
+        let url = unsafe { mem::transmute(str::from_utf8_unchecked(parser.get_until(b" ")?)) };
 
         // check the request is well formed
         if parser.get_until(b"\r\n")? != b"HTTP/1.1" {
@@ -120,13 +121,20 @@ impl<'a> HttpQuery<'a> {
                 break;
             }
 
-            match header.iter().enumerate().filter(|x| *x.1 == b':').next() {
-                Some((pos, _)) => {
-                    let (key, val) = header.split_at(pos);
-                    headers.insert(String::from_utf8(key.to_vec())?, String::from_utf8(val.to_vec())?);
-                },
-                None => return Err(ParserError::InvalidData)
-            };
+            let mut pos = 0;
+            for i in 1..header.len()-1 {
+                if header[i] == b':' {
+                    pos = i;
+                    break;
+                }
+            }
+            if pos == 0 {
+                return Err(ParserError::InvalidData);
+            }
+            // yes, this is awfully wrong, but it works ! Besides, we can do less allocations like that.
+            unsafe {
+                headers.insert(mem::transmute(str::from_utf8_unchecked(&header[..pos])), mem::transmute(str::from_utf8_unchecked(&header[pos+1..])));
+            }
         }
 
         Ok(HttpQuery {

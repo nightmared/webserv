@@ -1,7 +1,11 @@
 #![feature(test)]
 extern crate test;
+extern crate libc;
+#[cfg(test)]
+mod tests;
 mod http;
-mod benches;
+mod backingstore;
+mod messagequeue;
 
 fn main() {
 }
