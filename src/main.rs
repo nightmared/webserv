@@ -1,7 +1,7 @@
-mod aho;
+#![feature(test)]
+extern crate test;
 mod http;
-#[macro_use] extern crate lazy_static;
+mod benches;
 
 fn main() {
-    http::http_query::from_string(b"\r\n\r\nGET /lol17 HTTP/1.1\r\ntype: lol\r\n\r\nhi, what's up ?");
 }
