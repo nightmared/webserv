@@ -3,7 +3,7 @@ extern crate test;
 extern crate libc;
 #[cfg(test)]
 mod tests;
-mod lib;
+pub mod lib;
 
 fn main() {
 }
